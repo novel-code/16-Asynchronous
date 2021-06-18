@@ -245,56 +245,58 @@ const whereAmI = function (lat, lng) {
 // whereAmI(52.508, 13.381);
 // whereAmI(19.037, 72.873);
 whereAmI(-33.933, 18.474);
-*/
+
 // Lec 254 Event Loop in Practice
-/*
 console.log('Test start');
 setTimeout(() => console.log('0 sec timer'), 0);
-
 Promise.resolve('Resolved promise 1').then(res => console.log(res));
 
 Promise.resolve('Resolved promise 2').then(res => {
   for (let i = 0; i < 1000000000; i++) {}
   console.log(res);
 });
+
 console.log('Test end');
 */
-/////
-/*
+// Lec 255  Building a Simple Promise
 const lotteryPromise = new Promise(function (resolve, reject) {
-  console.log('Lottery draw is hapening 🔮');
+  console.log('Lottery draw is happening');
   setTimeout(function () {
     if (Math.random() >= 0.5) {
-      resolve('You WIN 😍');
+      resolve('You WIN!');
     } else {
-      reject(new Error('You lost your money 💩'));
+      reject(new Error('You lost your money..'));
     }
   }, 2000);
 });
 
 lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
 
-// Promisifying setTimeout
+// Promisifying setTimout
 const wait = function (seconds) {
   return new Promise(function (resolve) {
     setTimeout(resolve, seconds * 1000);
   });
 };
 
-wait(2)
+wait(1)
   .then(() => {
     console.log('1 second passed');
     return wait(1);
   })
   .then(() => {
-    console.log('2 second passed');
+    console.log('2 seconds passed');
     return wait(1);
   })
   .then(() => {
-    console.log('3 second passed');
+    console.log('3 seconds passed');
     return wait(1);
   })
-  .then(() => console.log('4 second passed'));
+  .then(() => {
+    console.log('4 seconds passed');
+    return wait(1);
+  })
+  .then(() => console.log('5 seconds passed'));
 
 // setTimeout(() => {
 //   console.log('1 second passed');
@@ -311,100 +313,3 @@ wait(2)
 
 Promise.resolve('abc').then(x => console.log(x));
 Promise.reject(new Error('Problem')).catch(x => console.error(x));
-*/
-// Lec 256
-
-const getPosition = function () {
-  return new Promise(function (resolve, reject) {
-    // navigator.geolocation.getCurrentPosition(
-    //   position => resolve(position),
-    //   err => reject(err)
-    // );
-    navigator.geolocation.getCurrentPosition(resolve, reject);
-  });
-};
-
-// getPosition().then(pos => console.log(pos));
-
-const whereAmI = function () {
-  getPosition()
-    .then(pos => {
-      const { latitude: lat, longitude: lng } = pos.coords;
-
-      return fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
-    })
-
-    .then(response => {
-      if (!response.ok)
-        throw new Error(`Problem with geocoding ${response.status}`);
-      console.log(response);
-      return response.json();
-    })
-    .then(data => {
-      // console.log(data);
-      console.log(`You are in ${data.city}, ${data.country}`);
-
-      return fetch(`https://restcountries.eu/rest/v2/name/${data.country}`);
-    })
-    .then(
-      response => {
-        if (!response.ok)
-          throw new Error(`Country not found (${response.status})`);
-        return response.json();
-      }
-
-      // err => alert(err)
-    )
-    .then(data => renderCountry(data[0]))
-    .catch(err => console.error(`${err.message} 🤦‍♂️`));
-};
-
-btn.addEventListener('click', whereAmI);
-
-// Coding Challenge 2 ( lec 257 )
-
-const wait = function (seconds) {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, seconds * 1000);
-  });
-};
-
-const imgContainer = document.querySelector('.images');
-
-const createImage = function (imgPath) {
-  return new Promise(function (resolve, reject) {
-    const img = document.createElement('img');
-    img.src = imgPath;
-
-    img.addEventListener('load', function () {
-      imgContainer.append(img);
-      resolve(img);
-    });
-
-    img.addEventListener('error', function () {
-      reject(new Error('Image not found'));
-    });
-  });
-};
-
-let currentImg;
-
-createImage('img/img-1.jpg')
-  .then(img => {
-    currentImg = img;
-    console.log('Image 1 loaded');
-    return wait(2);
-  })
-  .then(() => {
-    currentImg.style.display = 'none';
-    return createImage('img/img-2.jpg');
-  })
-  .then(img => {
-    currentImg = img;
-    console.log('Image 2 loaded');
-    return wait(2);
-  })
-  .then(() => {
-    currentImg.style.display = 'none';
-  })
-  .catch(err => console.error(err));
