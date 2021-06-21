@@ -313,7 +313,7 @@ wait(1)
 
 Promise.resolve('abc').then(x => console.log(x));
 Promise.reject(new Error('Problem')).catch(x => console.error(x));
-*/
+
 // Lec 256 Promisifying the Geolocation API
 
 const getPosition = function () {
@@ -410,5 +410,55 @@ createImage('img/img-1.jpg')
     currentImg.style.display = 'none';
   })
   .catch(err => console.error(err));
-
+*/
 // Lec 258 Async/await
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+// fetch(`https://restcountries.eu/rest/v2/name/${country}`).then(res =>
+//   console.log(res));
+
+const whereAmI = async function () {
+  try {
+    // Geolocation
+    const pos = await getPosition();
+    const { latitude: lat, longitude: lng } = pos.coords;
+
+    // Reverse geocoding
+    const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    if (!resGeo.ok) throw new Error('Problem getting location data');
+
+    const dataGeo = await resGeo.json();
+    console.log(dataGeo);
+
+    // Country data
+    const res = await fetch(
+      `https://restcountries.eu/rest/v2/name/${dataGeo.country}`
+    );
+    if (!res.ok) throw new Error('Problem getting country');
+
+    const data = await res.json();
+    console.log(data);
+    renderCountry(data[0]);
+  } catch (err) {
+    console.error(`${err} 🐱‍🚀`);
+    renderError(`🐱‍🐉
+     ${err.message}`);
+  }
+};
+whereAmI();
+whereAmI();
+whereAmI();
+console.log('FIRST');
+
+// Lec 259
+// try {
+//   let y = 1;
+//   const x = 2;
+//   y = 3;
+// } catch (err) {
+//   alert(err.message);
+// }
