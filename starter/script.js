@@ -363,7 +363,7 @@ const whereAmI = function () {
 
 btn.addEventListener('click', whereAmI);
 
-// lec 257 Coding Challeng 2
+// lec 257 Coding Challenge 2
 
 const wait = function (seconds) {
   return new Promise(function (resolve) {
@@ -480,7 +480,7 @@ console.log('1: Will get location');
 // } catch (err) {
 //   alert(err.message);
 // }
-*/
+
 // lec 260 returning values from async await
 
 // lec 261 Running Promise in Paralle
@@ -517,3 +517,56 @@ const get3Countries = async function (c1, c2, c3) {
 };
 
 get3Countries('portugal', 'canada', 'egypt');
+
+// Lec 262 Other Promise Combinators: race, allSettled and any
+(async function () {
+  const res = await Promise.race([
+    getJSON(`https://restcountries.eu/rest/v2/name/italy`),
+    getJSON(`https://restcountries.eu/rest/v2/name/egypt`),
+    getJSON(`https://restcountries.eu/rest/v2/name/mexico`),
+  ]);
+  console.log(res[0]);
+})();
+
+const timeout = function (sec) {
+  return new Promise(function (_, reject) {
+    setTimeout(function () {
+      reject(new Error('Request took too long!'));
+    }, sec * 1000);
+  });
+};
+
+Promise.race([
+  getJSON(`https://restcountries.eu/rest/v2/name/tanzania`),
+  timeout(0.4),
+])
+  .then(res => console.log(res[0]))
+  .catch(err => console.error(err));
+
+// Promise.allSettled
+Promise.allSettled([
+  Promise.resolve('Success'),
+  Promise.reject('Error'),
+  Promise.resolve('Another Success'),
+]).then(res => console.log(res));
+
+Promise.all([
+  Promise.resolve('Success'),
+  Promise.reject('Error'),
+  Promise.resolve('Another Success'),
+])
+  .then(res => console.log(res))
+  .catch(err => console.error(err));
+
+// Promise.any [ES2021]
+
+Promise.any([
+  Promise.resolve('Success'),
+  Promise.reject('Error'),
+  Promise.resolve('Another Success'),
+])
+  .then(res => console.log(res))
+  .catch(err => console.error(err));
+*/
+
+// Coding Challenge 3
